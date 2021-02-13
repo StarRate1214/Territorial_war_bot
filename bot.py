@@ -110,13 +110,14 @@ async def on_message(ctx):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
                 await ctx.channel.send(f'지금부터 영토전 흥보를 시작함 13시-23시 2시간간격')
-                client.loop.create_task(looping(ctx))
+                global task
+                task = client.loop.create_task(looping(ctx))
 
     if ctx.content.startswith("!흥보종료"):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
                 await ctx.channel.send(f'흥보종료 성공')
-                client.loop.stop
+                task.cancel()
 
     if ctx.content.startswith("!흥보메시지"):
         if ctx.guild:
