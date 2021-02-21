@@ -70,6 +70,7 @@ async def on_ready():  # 봇이 실행 준비가 되었을 때 행동할 것
 
 ok_hour = [4, 6, 8, 10, 12, 14]  # GMT 기준으로 측정되나봄 +9시간
 channel = 810843011629842432
+manage_bot_channel = 806541412505747478
 msg = "21.02.20 토요일 영토전은 덕무에서 합니다. 토요일 8시 30분 \"오그리아\"에서 만나도록 합시다.\n우리 검산의 3번째 부흥을 위해 함께 힘내봅시다.  [#영토전-참여여부  !영토전참가]"
 
 loop = asyncio.get_event_loop
@@ -126,7 +127,19 @@ async def on_message(ctx):
                 global msg
                 msg = pic
                 await ctx.channel.send(f'msg확인 "'+msg+'"')
-                
+
+    if ctx.content.startswith("닉네임:"):
+        pic = ctx.content[4:]
+        args = pic.split('\n')
+        author = ctx.author
+        name=args[0]
+        try:
+            await author.edit(nick=name)
+            if name:
+                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
+        except Exception as err:
+                await ctx.channel.send(err)
+
     if ctx.content.startswith("!청소"):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
@@ -134,6 +147,13 @@ async def on_message(ctx):
                 await ctx.delete()
                 await ctx.channel.purge(limit=number)
                 await ctx.channel.send(f"{number}개의 메시지 삭제")
+
+    if ctx.content.startswith("!뮤트"):
+                pic = ctx.content[4:22]
+                author = ctx.guild.get_member(int(pic))  # 디코이름 가져오기
+                role = discord.utils.get(message.Guild.roles, name="뮤트")
+                await author.add_roles(role)
+                await ctx.channel.send(f'"{author.display_name}" 뮤트 성공')
 
     if ctx.content.startswith("!도움"):
         await ctx.channel.send('!영토전참가 or !영토전참가 [닉네임] |영토전 참가하기 둘 중 아무거나 사용가능\n!영토전불참 or !영토전불참 [닉네임] | 영토전 불참하기 둘 중 아무거나 사용가능\n !병종입력 [병종1]/[병종2]/[병종3] | 영토전에 가져오는 병종입력 최대 5')
