@@ -138,7 +138,7 @@ async def on_message(ctx):
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
-                await ctx.channel.send(err)
+                await client.get_channel(manage_bot_channel).send(err)
 
     if ctx.content.startswith("!청소"):
         if ctx.guild:
