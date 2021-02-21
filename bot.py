@@ -159,7 +159,9 @@ async def on_message(ctx):
         await ctx.channel.send('!영토전참가 or !영토전참가 [닉네임] |영토전 참가하기 둘 중 아무거나 사용가능\n!영토전불참 or !영토전불참 [닉네임] | 영토전 불참하기 둘 중 아무거나 사용가능\n !병종입력 [병종1]/[병종2]/[병종3] | 영토전에 가져오는 병종입력 최대 5')
 
     if ctx.content.startswith("!서버도움"):
-        await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함\n!청소 [숫자] | 청소가 필요한 채널에서 입력시 해당 숫자만큼 메시지 삭제')
+        if ctx.guild:
+            if ctx.author.guild_permissions.manage_messages:
+                await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함\n!청소 [숫자] | 청소가 필요한 채널에서 입력시 해당 숫자만큼 메시지 삭제')
 
     #print ('msg:'+message.content)
     if ctx.content.startswith("!영토전참가"):
