@@ -18,8 +18,10 @@
 #########################################################################################
 
 import asyncio
+from asyncio.windows_events import NULL
 import discord
 import os
+from discord import message
 import gspread
 import datetime
 import time
@@ -29,7 +31,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 #bot token
 TOKEN = ""  # 봇 토큰 값
-json_file_name = ''  # 구글에서 발급받은 키값
+json_file_name = '/'  # 구글에서 발급받은 키값
 spreadsheet_url = ''  # 시트의 주소
 
 scope = [
@@ -54,7 +56,7 @@ worksheet_army = doc.worksheet('영토전-병종')
 #Guild_member = worksheet.range('D15:D114')
 #print(Guild_member)
 
-client = commands.Bot(command_prefix="!", help_command=None)
+client = commands.Bot(command_prefix="", help_command=None)
 
 
 @client.event
@@ -68,8 +70,8 @@ async def on_ready():  # 봇이 실행 준비가 되었을 때 행동할 것
 
 
 ok_hour = [4, 6, 8, 10, 12, 14]  # GMT 기준으로 측정되나봄 +9시간
-channel = 807086592266338305
-msg = "♚영☆토☆전♚참가시$\n$전원 은화☜☜공헌도100%증정※\n♜컨커러스 블레이드♜시즌미션 무료도움￥\n특정조건 §§관녕철기병§§★칸케식★\n$$고오급 전사로 승급할 절호의 기회$$\n즉시참가 영토전-참여여부 (!영토전참가)"
+channel = 810843011629842432
+msg = "우리 검산의 3번째 부흥을 위해 함께 힘내봅시다.  [#영토전-참여여부  !영토전참가]"
 
 loop = asyncio.get_event_loop
 
@@ -85,7 +87,6 @@ async def looping(ctx):
             await client.get_channel(channel).send(msg)
         await asyncio.sleep(60)
         now = datetime.datetime.now()
-
 
 @client.event
 async def on_message(ctx):
@@ -127,11 +128,21 @@ async def on_message(ctx):
                 msg = pic
                 await ctx.channel.send(f'msg확인 "'+msg+'"')
 
+    if ctx.content.startswith("!청소"):
+        if ctx.guild:
+            if ctx.author.guild_permissions.manage_messages:
+                number= int(ctx.content.split(" ")[1])
+                await ctx.delete()
+                await ctx.channel.purge(limit=number)
+                await ctx.channel.send(f"{number}개의 메시지 삭제")
+
     if ctx.content.startswith("!도움"):
-        await ctx.channel.send('!영토전참가 or !영토전참가 [이름] |영토전 참가하기 둘 중 아무거나 사용가능\n!영토전불참 or !영토전불참 [이름] | 영토전 불참하기 둘 중 아무거나 사용가능\n !병종입력 [병종1]/[병종2]/[병종3] | 영토전에 가져오는 병종입력 최대 5')
+        await ctx.channel.send('!영토전참가 or !영토전참가 [닉네임] |영토전 참가하기 둘 중 아무거나 사용가능\n!영토전불참 or !영토전불참 [닉네임] | 영토전 불참하기 둘 중 아무거나 사용가능\n !병종입력 [병종1]/[병종2]/[병종3] | 영토전에 가져오는 병종입력 최대 5')
 
     if ctx.content.startswith("!서버도움"):
-        await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함')
+        if ctx.guild:
+            if ctx.author.guild_permissions.manage_messages:
+                await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함\n!청소 [숫자] | 청소가 필요한 채널에서 입력시 해당 숫자만큼 메시지 삭제')
 
     #print ('msg:'+message.content)
     if ctx.content.startswith("!영토전참가"):
@@ -144,7 +155,7 @@ async def on_message(ctx):
                 Now_member = worksheet.acell('G15').value
                 await ctx.channel.send(f'"{pic}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
-                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림')
+                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
         else:
             try:
                 user = ctx.author
@@ -153,7 +164,7 @@ async def on_message(ctx):
                 Now_member = worksheet.acell('G15').value
                 await ctx.channel.send(f'"{user.display_name}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
-                await ctx.channel.send(f'이름이 없거나 틀림')
+                await ctx.channel.send(f'이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
 
     #print ('msg:'+message.content)
     if ctx.content.startswith("!영토전불참"):
