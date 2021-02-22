@@ -21,6 +21,7 @@ import asyncio
 import discord
 import os
 from discord import message
+from discord import channel
 import gspread
 import datetime
 import configparser
@@ -33,13 +34,14 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 config = configparser.ConfigParser()
 config.read(BASE_DIR+'/config.ini')
 print(config.sections())
-free_channel = config['settings']['I_free_channel']
-manage_bot_channel = config['settings']['I_manage_bot_channel']
-terrirorial_1_channel = config['settings']['I_terrirorial_1_channel']
-terrirorial_2_channel = config['settings']['I_terrirorial_2_channel']
+free_channel = int(config['settings']['I_free_channel'])
+manage_bot_channel = int(config['settings']['I_manage_bot_channel'])
+terrirorial_1_channel = int(config['settings']['I_terrirorial_1_channel'])
+terrirorial_2_channel = int(config['settings']['I_terrirorial_2_channel'])
 TOKEN = config['settings']['I_TOKEN']
 json_file_name = config['settings']['I_json_file_name']
 spreadsheet_url = config['settings']['I_spreadsheet_url']
+
 scope = [
     'https://spreadsheets.google.com/feeds',
     'https://www.googleapis.com/auth/drive',
@@ -82,12 +84,12 @@ loop = asyncio.get_event_loop
 async def looping():
     now = datetime.datetime.now()
     old_hour = now.hour
-    await client.get_channel(free_channel).send(msg)
+    await client.get_channel(channel).send(msg)
     while True:
         if (old_hour != now.hour) & (now.hour in ok_hour):
             old_hour = now.hour
             now = datetime.datetime.now()
-            await client.get_channel(free_channel).send(msg)
+            await client.get_channel(channel).send(msg)
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
@@ -96,6 +98,10 @@ async def looping():
 async def on_message(ctx):
     if ctx.author == client.user:
         return
+    
+    if ctx.content.startswith("!자유말하기"):
+        pic = ctx.content[7:]
+        await client.get_channel(free_channel).send(pic)
 
     # if ctx.content.startswith("!뮤트"):
     #     if ctx.guild:
