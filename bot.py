@@ -23,21 +23,33 @@ import os
 from discord import message
 import gspread
 import datetime
+import configparser
 from discord.ext import commands
 from oauth2client.service_account import ServiceAccountCredentials
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+config = configparser.ConfigParser()
+config.read(BASE_DIR+'/config.ini')
+print(config.sections())
+free_channel = config['settings']['I_free_channel']
+manage_bot_channel = config['settings']['I_manage_bot_channel']
+terrirorial_1_channel = config['settings']['I_terrirorial_1_channel']
+terrirorial_2_channel = config['settings']['I_terrirorial_2_channel']
+TOKEN = config['settings']['I_TOKEN']
+json_file_name = config['settings']['I_json_file_name']
+spreadsheet_url = config['settings']['I_spreadsheet_url']
 
 #bot token
-TOKEN = ""  # 봇 토큰 값
-json_file_name = ''  # 구글에서 발급받은 키값
-spreadsheet_url = ''  # 시트의 주소
+TOKEN = "ODA1MzU2NTU3OTE0OTk2NzY2.YBZsvg.ffukrfVqx2QZ7rd12S5HCoOsDhk"  # 봇 토큰 값
+json_file_name = '/territorialwarbot-f6323180e6c5.json'  # 구글에서 발급받은 키값
+spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1wb5r6ebMF5Yvh5Gbe-rk0y73d5alDqXaquvl1Ne7YBw/edit#gid=0'  # 시트의 주소
 
 scope = [
     'https://spreadsheets.google.com/feeds',
     'https://www.googleapis.com/auth/drive',
 ]
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(
     BASE_DIR+json_file_name, scope)
@@ -68,10 +80,6 @@ async def on_ready():  # 봇이 실행 준비가 되었을 때 행동할 것
 
 
 ok_hour = [4, 6, 8, 10, 12, 14]  # GMT 기준으로 측정되나봄 +9시간
-free_channel = 810843011629842432
-manage_bot_channel = 813305553220272138
-terrirorial_1_channel = 797998061737607178
-terrirorial_2_channel = 798008167597867048
 msg = "21.02.23 화요일 영토전은 덕무에서 합니다.\n 8시 30분 \"오그리아\"에서 만나도록 합시다.\n우리 검산의 3번째 부흥을 위해 함께 힘내봅시다.\n  [<#805768950137880606>  !영토전참가]"
 
 loop = asyncio.get_event_loop
@@ -88,6 +96,7 @@ async def looping():
             await client.get_channel(free_channel).send(msg)
         await asyncio.sleep(60)
         now = datetime.datetime.now()
+
 
 @client.event
 async def on_message(ctx):
@@ -109,54 +118,54 @@ async def on_message(ctx):
         pic = ctx.content[4:]
         args = pic.split('\n')
         author = ctx.author
-        name=args[0]
+        name = args[0]
         try:
             await author.edit(nick=name)
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
-                await client.get_channel(manage_bot_channel).send(err)
+            await client.get_channel(manage_bot_channel).send(err)
 
     if ctx.content.startswith("닉네임 :"):
         pic = ctx.content[5:]
         args = pic.split('\n')
         author = ctx.author
-        name=args[0]
+        name = args[0]
         try:
             await author.edit(nick=name)
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
-                await client.get_channel(manage_bot_channel).send(err)
+            await client.get_channel(manage_bot_channel).send(err)
 
     if ctx.content.startswith("닉네임: "):
         pic = ctx.content[5:]
         args = pic.split('\n')
         author = ctx.author
-        name=args[0]
+        name = args[0]
         try:
             await author.edit(nick=name)
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
-                await client.get_channel(manage_bot_channel).send(err)
+            await client.get_channel(manage_bot_channel).send(err)
 
     if ctx.content.startswith("닉네임 : "):
         pic = ctx.content[6:]
         args = pic.split('\n')
         author = ctx.author
-        name=args[0]
+        name = args[0]
         try:
             await author.edit(nick=name)
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
-                await client.get_channel(manage_bot_channel).send(err)
+            await client.get_channel(manage_bot_channel).send(err)
 
     if ctx.content.startswith("!청소"):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
-                number= int(ctx.content.split(" ")[1])
+                number = int(ctx.content.split(" ")[1])
                 await ctx.delete()
                 await ctx.channel.purge(limit=number)
                 await ctx.channel.send(f"{number}개의 메시지 삭제")
