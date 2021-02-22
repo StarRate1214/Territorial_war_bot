@@ -23,14 +23,13 @@ import os
 from discord import message
 import gspread
 import datetime
-import time
 from discord.ext import commands
 from oauth2client.service_account import ServiceAccountCredentials
 
 
 #bot token
 TOKEN = ""  # 봇 토큰 값
-json_file_name = '/'  # 구글에서 발급받은 키값
+json_file_name = ''  # 구글에서 발급받은 키값
 spreadsheet_url = ''  # 시트의 주소
 
 scope = [
@@ -69,22 +68,24 @@ async def on_ready():  # 봇이 실행 준비가 되었을 때 행동할 것
 
 
 ok_hour = [4, 6, 8, 10, 12, 14]  # GMT 기준으로 측정되나봄 +9시간
-channel = 810843011629842432
-manage_bot_channel = 806541412505747478
-msg = "21.02.20 토요일 영토전은 덕무에서 합니다. 토요일 8시 30분 \"오그리아\"에서 만나도록 합시다.\n우리 검산의 3번째 부흥을 위해 함께 힘내봅시다.  [#영토전-참여여부  !영토전참가]"
+free_channel = 810843011629842432
+manage_bot_channel = 813305553220272138
+terrirorial_1_channel = 797998061737607178
+terrirorial_2_channel = 798008167597867048
+msg = "21.02.23 화요일 영토전은 덕무에서 합니다.\n 8시 30분 \"오그리아\"에서 만나도록 합시다.\n우리 검산의 3번째 부흥을 위해 함께 힘내봅시다.\n  [<#805768950137880606>  !영토전참가]"
 
 loop = asyncio.get_event_loop
 
 
-async def looping(ctx):
+async def looping():
     now = datetime.datetime.now()
     old_hour = now.hour
-    await client.get_channel(channel).send(msg)
+    await client.get_channel(free_channel).send(msg)
     while True:
         if (old_hour != now.hour) & (now.hour in ok_hour):
             old_hour = now.hour
             now = datetime.datetime.now()
-            await client.get_channel(channel).send(msg)
+            await client.get_channel(free_channel).send(msg)
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
@@ -93,43 +94,55 @@ async def on_message(ctx):
     if ctx.author == client.user:
         return
 
-    if ctx.content.startswith("!병종입력"):
-        try:
-            user = ctx.author  # 디코이름 가져오기
-            Guild_member = worksheet_army.find(user.display_name)  # 이름 찾기
-            pic = ctx.content[6:]
-            arr = pic.split("/")
-            col_num = 3
-            for i in arr:
-                worksheet_army.update_cell(Guild_member.row, col_num, i)
-                col_num = col_num + 1
-            await ctx.channel.send(f'"{user.display_name}" 병종입력 성공')
-        except:
-            await ctx.channel.send(f'병종입력 실패')
-
-    if ctx.content.startswith("!흥보시작"):
-        if ctx.guild:
-            if ctx.author.guild_permissions.manage_messages:
-                await ctx.channel.send(f'지금부터 영토전 흥보를 시작함 13시-23시 2시간간격')
-                global task
-                task = client.loop.create_task(looping(ctx))
-
-    if ctx.content.startswith("!흥보종료"):
-        if ctx.guild:
-            if ctx.author.guild_permissions.manage_messages:
-                await ctx.channel.send(f'흥보종료 성공')
-                task.cancel()
-
-    if ctx.content.startswith("!흥보메시지"):
-        if ctx.guild:
-            if ctx.author.guild_permissions.manage_messages:
-                pic = ctx.content[7:]
-                global msg
-                msg = pic
-                await ctx.channel.send(f'msg확인 "'+msg+'"')
+    # if ctx.content.startswith("!뮤트"):
+    #     if ctx.guild:
+    #         if ctx.author.guild_permissions.manage_messages:
+    #             role = ""
+    #             for i in ctx.guild.roles:
+    #                 if i.name == "뮤트":
+    #                     role = i
+    #                     break
+    #             channel = ctx.guild.get_channel(terrirorial_1_channel)
+    #             await channel.set_permissions(role, speak=False)
 
     if ctx.content.startswith("닉네임:"):
         pic = ctx.content[4:]
+        args = pic.split('\n')
+        author = ctx.author
+        name=args[0]
+        try:
+            await author.edit(nick=name)
+            if name:
+                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
+        except Exception as err:
+                await client.get_channel(manage_bot_channel).send(err)
+
+    if ctx.content.startswith("닉네임 :"):
+        pic = ctx.content[5:]
+        args = pic.split('\n')
+        author = ctx.author
+        name=args[0]
+        try:
+            await author.edit(nick=name)
+            if name:
+                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
+        except Exception as err:
+                await client.get_channel(manage_bot_channel).send(err)
+
+    if ctx.content.startswith("닉네임: "):
+        pic = ctx.content[5:]
+        args = pic.split('\n')
+        author = ctx.author
+        name=args[0]
+        try:
+            await author.edit(nick=name)
+            if name:
+                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
+        except Exception as err:
+                await client.get_channel(manage_bot_channel).send(err)
+
+    if ctx.content.startswith("닉네임 : "):
+        pic = ctx.content[6:]
         args = pic.split('\n')
         author = ctx.author
         name=args[0]
@@ -148,12 +161,40 @@ async def on_message(ctx):
                 await ctx.channel.purge(limit=number)
                 await ctx.channel.send(f"{number}개의 메시지 삭제")
 
-    if ctx.content.startswith("!뮤트"):
-                pic = ctx.content[4:22]
-                author = ctx.guild.get_member(int(pic))  # 디코이름 가져오기
-                role = discord.utils.get(message.Guild.roles, name="뮤트")
-                await author.add_roles(role)
-                await ctx.channel.send(f'"{author.display_name}" 뮤트 성공')
+    if ctx.content.startswith("!병종입력"):
+        try:
+            user = ctx.author  # 디코이름 가져오기
+            Guild_member = worksheet_army.find(user.display_name)  # 이름 찾기
+            pic = ctx.content[6:]
+            arr = pic.split("/")
+            col_num = 3
+            for i in arr:
+                worksheet_army.update_cell(Guild_member.row, col_num, i)
+                col_num = col_num + 1
+            await ctx.channel.send(f'"{user.display_name}" 병종입력 성공')
+        except:
+            await ctx.channel.send(f'병종입력 실패')
+
+    if ctx.content.startswith("!홍보시작"):
+        if ctx.guild:
+            if ctx.author.guild_permissions.manage_messages:
+                await ctx.channel.send(f'지금부터 영토전 홍보를 시작함 13시-23시 2시간간격')
+                global task
+                task = client.loop.create_task(looping())
+
+    if ctx.content.startswith("!홍보종료"):
+        if ctx.guild:
+            if ctx.author.guild_permissions.manage_messages:
+                await ctx.channel.send(f'홍보종료 성공')
+                task.cancel()
+
+    if ctx.content.startswith("!홍보메시지"):
+        if ctx.guild:
+            if ctx.author.guild_permissions.manage_messages:
+                pic = ctx.content[7:]
+                global msg
+                msg = pic
+                await ctx.channel.send(f'msg확인 "'+msg+'"')
 
     if ctx.content.startswith("!도움"):
         await ctx.channel.send('!영토전참가 or !영토전참가 [닉네임] |영토전 참가하기 둘 중 아무거나 사용가능\n!영토전불참 or !영토전불참 [닉네임] | 영토전 불참하기 둘 중 아무거나 사용가능\n !병종입력 [병종1]/[병종2]/[병종3] | 영토전에 가져오는 병종입력 최대 5')
@@ -163,10 +204,8 @@ async def on_message(ctx):
             if ctx.author.guild_permissions.manage_messages:
                 await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함\n!청소 [숫자] | 청소가 필요한 채널에서 입력시 해당 숫자만큼 메시지 삭제')
 
-    #print ('msg:'+message.content)
     if ctx.content.startswith("!영토전참가"):
         pic = ctx.content[7:]
-        #print('pic"'+pic+'"')
         if pic != '':
             try:
                 Guild_member = worksheet.find(pic)
@@ -185,10 +224,8 @@ async def on_message(ctx):
             except:
                 await ctx.channel.send(f'이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
 
-    #print ('msg:'+message.content)
     if ctx.content.startswith("!영토전불참"):
         pic = ctx.content[7:]
-        #print('pic"'+pic+'"')
         if pic != '':
             try:
                 Guild_member = worksheet.find(pic)
