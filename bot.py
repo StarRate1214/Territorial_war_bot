@@ -32,7 +32,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 config = configparser.ConfigParser()
-config.read(BASE_DIR+'/config.ini')
+config.read(BASE_DIR+'/../config.ini')
 print(config.sections())
 free_channel = int(config['settings']['I_free_channel'])
 manage_bot_channel = int(config['settings']['I_manage_bot_channel'])
