@@ -40,12 +40,6 @@ terrirorial_2_channel = config['settings']['I_terrirorial_2_channel']
 TOKEN = config['settings']['I_TOKEN']
 json_file_name = config['settings']['I_json_file_name']
 spreadsheet_url = config['settings']['I_spreadsheet_url']
-
-#bot token
-TOKEN = "ODA1MzU2NTU3OTE0OTk2NzY2.YBZsvg.ffukrfVqx2QZ7rd12S5HCoOsDhk"  # 봇 토큰 값
-json_file_name = '/territorialwarbot-f6323180e6c5.json'  # 구글에서 발급받은 키값
-spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1wb5r6ebMF5Yvh5Gbe-rk0y73d5alDqXaquvl1Ne7YBw/edit#gid=0'  # 시트의 주소
-
 scope = [
     'https://spreadsheets.google.com/feeds',
     'https://www.googleapis.com/auth/drive',
