@@ -76,7 +76,7 @@ async def on_ready():  # 봇이 실행 준비가 되었을 때 행동할 것
 
 
 ok_hour = [4, 6, 8, 10, 12, 14]  # GMT 기준으로 측정되나봄 +9시간
-msg = "21.02.23 화요일 영토전은 덕무에서 합니다.\n 8시 30분 \"오그리아\"에서 만나도록 합시다.\n우리 검산의 3번째 부흥을 위해 함께 힘내봅시다.\n  [<#805768950137880606>  !영토전참가]"
+msg = "다들 영토전 참가여부 한번씩 알려줘 오른쪽 누르면 바로 가지니까 부탁해 [<#805768950137880606> !영토전참가]"
 
 loop = asyncio.get_event_loop
 
@@ -100,8 +100,10 @@ async def on_message(ctx):
         return
     
     if ctx.content.startswith("!자유말하기"):
-        pic = ctx.content[7:]
-        await client.get_channel(free_channel).send(pic)
+        if ctx.guild:
+            if ctx.author.guild_permissions.manage_messages:
+                pic = ctx.content[7:]
+                await client.get_channel(free_channel).send(pic)
 
     # if ctx.content.startswith("!뮤트"):
     #     if ctx.guild:
@@ -113,30 +115,6 @@ async def on_message(ctx):
     #                     break
     #             channel = ctx.guild.get_channel(terrirorial_1_channel)
     #             await channel.set_permissions(role, speak=False)
-
-    if ctx.content.startswith("닉네임:"):
-        pic = ctx.content[4:]
-        args = pic.split('\n')
-        author = ctx.author
-        name = args[0]
-        try:
-            await author.edit(nick=name)
-            if name:
-                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
-        except Exception as err:
-            await client.get_channel(manage_bot_channel).send(err)
-
-    if ctx.content.startswith("닉네임 :"):
-        pic = ctx.content[5:]
-        args = pic.split('\n')
-        author = ctx.author
-        name = args[0]
-        try:
-            await author.edit(nick=name)
-            if name:
-                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
-        except Exception as err:
-            await client.get_channel(manage_bot_channel).send(err)
 
     if ctx.content.startswith("닉네임: "):
         pic = ctx.content[5:]
@@ -150,8 +128,32 @@ async def on_message(ctx):
         except Exception as err:
             await client.get_channel(manage_bot_channel).send(err)
 
+    elif ctx.content.startswith("닉네임:"):
+        pic = ctx.content[4:]
+        args = pic.split('\n')
+        author = ctx.author
+        name = args[0]
+        try:
+            await author.edit(nick=name)
+            if name:
+                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
+        except Exception as err:
+            await client.get_channel(manage_bot_channel).send(err)
+
     if ctx.content.startswith("닉네임 : "):
         pic = ctx.content[6:]
+        args = pic.split('\n')
+        author = ctx.author
+        name = args[0]
+        try:
+            await author.edit(nick=name)
+            if name:
+                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
+        except Exception as err:
+            await client.get_channel(manage_bot_channel).send(err)
+    
+    elif ctx.content.startswith("닉네임 :"):
+        pic = ctx.content[5:]
         args = pic.split('\n')
         author = ctx.author
         name = args[0]
@@ -206,12 +208,12 @@ async def on_message(ctx):
                 await ctx.channel.send(f'msg확인 "'+msg+'"')
 
     if ctx.content.startswith("!도움"):
-        await ctx.channel.send('!영토전참가 or !영토전참가 [닉네임] |영토전 참가하기 둘 중 아무거나 사용가능\n!영토전불참 or !영토전불참 [닉네임] | 영토전 불참하기 둘 중 아무거나 사용가능\n !병종입력 [병종1]/[병종2]/[병종3] | 영토전에 가져오는 병종입력 최대 5')
+        await ctx.channel.send('!영토전참가 or !영토전참가 [닉네임] |영토전 참가하기 둘 중 아무거나 사용가능\n!영토전불참 or !영토전불참 [닉네임] | 영토전 불참하기 둘 중 아무거나 사용가능\n !병종입력 진충/팔레르모/양양 투창 사사/... | 영토전에 가져오는 병종입력 최대 5')
 
     if ctx.content.startswith("!서버도움"):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
-                await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함\n!청소 [숫자] | 청소가 필요한 채널에서 입력시 해당 숫자만큼 메시지 삭제')
+                await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함\n!청소 [숫자] | 청소가 필요한 채널에서 입력시 해당 숫자만큼 메시지 삭제\n!자유말하기 [메시지] | 자유-채팅방에 봇이 메시지를 말함')
 
     if ctx.content.startswith("!영토전참가"):
         pic = ctx.content[7:]
@@ -231,7 +233,7 @@ async def on_message(ctx):
                 Now_member = worksheet.acell('G15').value
                 await ctx.channel.send(f'"{user.display_name}" 영토전참가 확인됨 [참가인원] {Now_member}명\n<#807572797365813269>에서 !병종입력 [병종1]/[병종2]/...을 통해 본인이 가져가는 병종을 알려주세요!')
             except:
-                await ctx.channel.send(f'이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
+                await ctx.channel.send(f'"{user.display_name}" 이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
 
     if ctx.content.startswith("!영토전불참"):
         pic = ctx.content[7:]
@@ -242,7 +244,7 @@ async def on_message(ctx):
                 Now_member = worksheet.acell('G15').value
                 await ctx.channel.send(f'"{pic}" 영토전불참 확인됨 [참가인원] {Now_member}명')
             except:
-                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림')
+                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
         else:
             try:
                 user = ctx.author
@@ -251,7 +253,7 @@ async def on_message(ctx):
                 Now_member = worksheet.acell('G15').value
                 await ctx.channel.send(f'"{user.display_name}" 영토전불참 확인됨 [참가인원] {Now_member}명')
             except:
-                await ctx.channel.send(f'이름이 없거나 틀림')
+                await ctx.channel.send(f'"{user.display_name}" 이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
 
 
 # @client.command(name='영토전참가')
