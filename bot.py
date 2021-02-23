@@ -84,12 +84,12 @@ loop = asyncio.get_event_loop
 async def looping():
     now = datetime.datetime.now()
     old_hour = now.hour
-    await client.get_channel(channel).send(msg)
+    await client.get_channel(free_channel).send(msg)
     while True:
         if (old_hour != now.hour) & (now.hour in ok_hour):
             old_hour = now.hour
             now = datetime.datetime.now()
-            await client.get_channel(channel).send(msg)
+            await client.get_channel(free_channel).send(msg)
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
