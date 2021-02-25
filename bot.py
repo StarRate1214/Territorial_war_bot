@@ -222,18 +222,19 @@ async def on_message(ctx):
                 Guild_member = worksheet.find(pic)
                 worksheet.update_cell(Guild_member.row, 7, "O")
                 Now_member = worksheet.acell('G15').value
-                await ctx.channel.send(f'"{pic}" 영토전참가 확인됨 [참가인원] {Now_member}명\n<#807572797365813269>에서 !병종입력 [병종1]/[병종2]/...을 통해 본인이 가져가는 병종을 알려주세요!')
+                await ctx.channel.send(f'"{pic}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
-                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
+                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
         else:
             try:
                 user = ctx.author
-                Guild_member = worksheet.find(user.display_name)
+                dis_name = user.display_name.split(" ")
+                Guild_member = worksheet.find(dis_name[1])
                 worksheet.update_cell(Guild_member.row, 7, "O")
                 Now_member = worksheet.acell('G15').value
-                await ctx.channel.send(f'"{user.display_name}" 영토전참가 확인됨 [참가인원] {Now_member}명\n<#807572797365813269>에서 !병종입력 [병종1]/[병종2]/...을 통해 본인이 가져가는 병종을 알려주세요!')
+                await ctx.channel.send(f'"{dis_name[1]}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
-                await ctx.channel.send(f'"{user.display_name}" 이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
+                await ctx.channel.send(f'"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
 
     if ctx.content.startswith("!영토전불참"):
         pic = ctx.content[7:]
@@ -244,16 +245,17 @@ async def on_message(ctx):
                 Now_member = worksheet.acell('G15').value
                 await ctx.channel.send(f'"{pic}" 영토전불참 확인됨 [참가인원] {Now_member}명')
             except:
-                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
+                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
         else:
             try:
                 user = ctx.author
-                Guild_member = worksheet.find(user.display_name)
+                dis_name = user.display_name.split(" ")
+                Guild_member = worksheet.find(dis_name[1])
                 worksheet.update_cell(Guild_member.row, 7, "X")
                 Now_member = worksheet.acell('G15').value
-                await ctx.channel.send(f'"{user.display_name}" 영토전불참 확인됨 [참가인원] {Now_member}명')
+                await ctx.channel.send(f'"{dis_name[1]}" 영토전불참 확인됨 [참가인원] {Now_member}명')
             except:
-                await ctx.channel.send(f'"{user.display_name}" 이름이 없거나 틀림 신규 가문원이라면 #병종-시트에서 확인 후 진행')
+                await ctx.channel.send(f'"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
 
 
 # @client.command(name='영토전참가')
