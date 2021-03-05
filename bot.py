@@ -215,9 +215,11 @@ async def on_message(ctx):
             if ctx.author.guild_permissions.manage_messages:
                 pic = ctx.content[7:]
                 global msg
-                msg = pic
+                msg = str(pic)
                 config.set('settings', 'I_msg', msg)
-                with open(END_FILE, 'wb', encoding="utf8") as configfile:
+                print(config.get("settings", "I_msg"))
+                #config['settings']['I_msg'] = msg
+                with open(END_FILE, 'w', encoding="utf8") as configfile:
                     config.write(configfile)
                 await ctx.channel.send(f'msg확인 "'+msg+'"')
 
