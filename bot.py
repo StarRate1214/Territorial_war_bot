@@ -25,14 +25,15 @@ from discord import channel
 import gspread
 import datetime
 import configparser
+import json
 from discord.ext import commands
 from oauth2client.service_account import ServiceAccountCredentials
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
+END_FILE = BASE_DIR+'\\..\\config.ini'
+print(END_FILE)
 config = configparser.ConfigParser()
-config.read(BASE_DIR+'/../config.ini')
+config.read(END_FILE, encoding="utf8")
 print(config.sections())
 free_channel = int(config['settings']['I_free_channel'])
 manage_bot_channel = int(config['settings']['I_manage_bot_channel'])
@@ -41,6 +42,9 @@ terrirorial_2_channel = int(config['settings']['I_terrirorial_2_channel'])
 TOKEN = config['settings']['I_TOKEN']
 json_file_name = config['settings']['I_json_file_name']
 spreadsheet_url = config['settings']['I_spreadsheet_url']
+msg = config['settings']['I_msg']
+ok_hour = config['settings']['I_ok_hour']
+ok_hour = json.loads(ok_hour)
 
 scope = [
     'https://spreadsheets.google.com/feeds',
@@ -75,13 +79,10 @@ async def on_ready():  # 봇이 실행 준비가 되었을 때 행동할 것
     await client.change_presence(status=discord.Status.online, activity=discord.Game('"!도움" 도움말 호출'))
 
 
-ok_hour = [4, 6, 8, 10, 12, 14]  # GMT 기준으로 측정되나봄 +9시간
-msg = "다들 영토전 참가여부 한번씩 알려줘 오른쪽 누르면 바로 가지니까 부탁해 [<#805768950137880606> !영토전참가]"
-
+  # GMT 기준으로 측정되나봄 +9시간
 loop = asyncio.get_event_loop
 
-
-async def looping():
+async def ad_looping():
     now = datetime.datetime.now()
     old_hour = now.hour
     await client.get_channel(free_channel).send(msg)
@@ -92,7 +93,6 @@ async def looping():
             await client.get_channel(free_channel).send(msg)
         await asyncio.sleep(60)
         now = datetime.datetime.now()
-
 
 @client.event
 async def on_message(ctx):
@@ -121,8 +121,11 @@ async def on_message(ctx):
         args = pic.split('\n')
         author = ctx.author
         name = args[0]
+        guild = args[1][4:]
+        level = args[2][4:]
+        full_name = guild + " " + name + " " + level
         try:
-            await author.edit(nick=name)
+            await author.edit(nick=full_name)
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
@@ -133,8 +136,11 @@ async def on_message(ctx):
         args = pic.split('\n')
         author = ctx.author
         name = args[0]
+        guild = args[1][3:]
+        level = args[2][3:]
+        full_name = guild + " " + name + " " + level
         try:
-            await author.edit(nick=name)
+            await author.edit(nick=full_name)
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
@@ -145,8 +151,11 @@ async def on_message(ctx):
         args = pic.split('\n')
         author = ctx.author
         name = args[0]
+        guild = args[1][5:]
+        level = args[2][5:]
+        full_name = guild + " " + name + " " + level
         try:
-            await author.edit(nick=name)
+            await author.edit(nick=full_name)
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
@@ -156,9 +165,11 @@ async def on_message(ctx):
         pic = ctx.content[5:]
         args = pic.split('\n')
         author = ctx.author
-        name = args[0]
+        guild = args[1][4:]
+        level = args[2][4:]
+        full_name = guild + " " + name + " " + level
         try:
-            await author.edit(nick=name)
+            await author.edit(nick=full_name)
             if name:
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
@@ -190,14 +201,14 @@ async def on_message(ctx):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
                 await ctx.channel.send(f'지금부터 영토전 홍보를 시작함 13시-23시 2시간간격')
-                global task
-                task = client.loop.create_task(looping())
+                global ad_task
+                ad_task = client.loop.create_task(ad_looping())
 
     if ctx.content.startswith("!홍보종료"):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
                 await ctx.channel.send(f'홍보종료 성공')
-                task.cancel()
+                ad_task.cancel()
 
     if ctx.content.startswith("!홍보메시지"):
         if ctx.guild:
@@ -205,6 +216,9 @@ async def on_message(ctx):
                 pic = ctx.content[7:]
                 global msg
                 msg = pic
+                config.set('settings', 'I_msg', msg)
+                with open(END_FILE, 'wb', encoding="utf8") as configfile:
+                    config.write(configfile)
                 await ctx.channel.send(f'msg확인 "'+msg+'"')
 
     if ctx.content.startswith("!도움"):
