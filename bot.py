@@ -44,7 +44,9 @@ json_file_name = config['settings']['I_json_file_name']
 spreadsheet_url = config['settings']['I_spreadsheet_url']
 msg = config['settings']['I_msg']
 ok_hour = config['settings']['I_ok_hour']
+ok_minute = config['settings']['I_ok_minute']
 ok_hour = json.loads(ok_hour)
+ok_minute = json.loads(ok_minute)
 
 scope = [
     'https://spreadsheets.google.com/feeds',
@@ -88,9 +90,10 @@ async def ad_looping():
     await client.get_channel(free_channel).send(msg)
     while True:
         if (old_hour != now.hour) & (now.hour in ok_hour):
-            old_hour = now.hour
-            now = datetime.datetime.now()
-            await client.get_channel(free_channel).send(msg)
+            if(now.minute in ok_minute):
+                old_hour = now.hour
+                now = datetime.datetime.now()
+                await client.get_channel(free_channel).send(msg)
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
@@ -200,7 +203,7 @@ async def on_message(ctx):
     if ctx.content.startswith("!홍보시작"):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
-                await ctx.channel.send(f'지금부터 영토전 홍보를 시작함 13시-23시 2시간간격')
+                await ctx.channel.send(f'지금부터 영토전 홍보를 시작함 12시- 02시 30분 간격')
                 global ad_task
                 ad_task = client.loop.create_task(ad_looping())
 
