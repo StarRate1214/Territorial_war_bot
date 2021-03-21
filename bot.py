@@ -60,8 +60,8 @@ doc = gc.open_by_url(spreadsheet_url)
 
 # 시트 선택하기
 worksheet = doc.worksheet('병종 시트')
-worksheet_manage = doc.worksheet('영토전-관리용')
-worksheet_army = doc.worksheet('영토전-병종')
+#worksheet_manage = doc.worksheet('영토전-관리용')
+#worksheet_army = doc.worksheet('영토전-병종')
 
 #Guild_member = worksheet.range('D15:D114')
 #print(Guild_member)
@@ -236,8 +236,8 @@ async def on_message(ctx):
         if pic != '':
             try:
                 Guild_member = worksheet.find(pic)
-                worksheet.update_cell(Guild_member.row, 7, "O")
-                Now_member = worksheet.acell('G15').value
+                worksheet.update_cell(Guild_member.row, 9, "O")
+                Now_member = worksheet.acell('G4').value
                 await ctx.channel.send(f'"{pic}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
@@ -246,8 +246,8 @@ async def on_message(ctx):
                 user = ctx.author
                 dis_name = user.display_name.split(" ")
                 Guild_member = worksheet.find(dis_name[1])
-                worksheet.update_cell(Guild_member.row, 7, "O")
-                Now_member = worksheet.acell('G15').value
+                worksheet.update_cell(Guild_member.row, 9, "O")
+                Now_member = worksheet.acell('G4').value
                 await ctx.channel.send(f'"{dis_name[1]}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
@@ -257,8 +257,8 @@ async def on_message(ctx):
         if pic != '':
             try:
                 Guild_member = worksheet.find(pic)
-                worksheet.update_cell(Guild_member.row, 7, "X")
-                Now_member = worksheet.acell('G15').value
+                worksheet.update_cell(Guild_member.row, 9, "X")
+                Now_member = worksheet.acell('G4').value
                 await ctx.channel.send(f'"{pic}" 영토전불참 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
@@ -267,8 +267,8 @@ async def on_message(ctx):
                 user = ctx.author
                 dis_name = user.display_name.split(" ")
                 Guild_member = worksheet.find(dis_name[1])
-                worksheet.update_cell(Guild_member.row, 7, "X")
-                Now_member = worksheet.acell('G15').value
+                worksheet.update_cell(Guild_member.row, 9, "X")
+                Now_member = worksheet.acell('G4').value
                 await ctx.channel.send(f'"{dis_name[1]}" 영토전불참 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
@@ -278,7 +278,7 @@ async def on_message(ctx):
 # async def roll(ctx,Inputname):#닉네임 지정해서 쓸때
 #     try:
 #         Guild_member = worksheet.find(Inputname)
-#         worksheet.update_cell(Guild_member.row, 7, "O")
+#         worksheet.update_cell(Guild_member.row, 9, "O")
 #         Now_member = worksheet.acell('G15').value
 #         await ctx.send(f'"{Inputname}" 영토전참가 확인됨 [참가인원] {Now_member}명')
 #     except:
