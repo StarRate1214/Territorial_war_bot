@@ -240,7 +240,7 @@ async def on_message(ctx):
             try:
                 Guild_member = worksheet.find(pic)
                 worksheet.update_cell(Guild_member.row, 9, "O")
-                Now_member = worksheet.acell('I4').value
+                Now_member = worksheet.acell('J4').value
                 await ctx.channel.send(f'"{pic}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
@@ -250,7 +250,7 @@ async def on_message(ctx):
                 dis_name = user.display_name.split(" ")
                 Guild_member = worksheet.find(dis_name[1])
                 worksheet.update_cell(Guild_member.row, 9, "O")
-                Now_member = worksheet.acell('I4').value
+                Now_member = worksheet.acell('J4').value
                 await ctx.channel.send(f'"{dis_name[1]}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
@@ -261,7 +261,7 @@ async def on_message(ctx):
             try:
                 Guild_member = worksheet.find(pic)
                 worksheet.update_cell(Guild_member.row, 9, "X")
-                Now_member = worksheet.acell('I4').value
+                Now_member = worksheet.acell('J4').value
                 await ctx.channel.send(f'"{pic}" 영토전불참 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
@@ -271,7 +271,7 @@ async def on_message(ctx):
                 dis_name = user.display_name.split(" ")
                 Guild_member = worksheet.find(dis_name[1])
                 worksheet.update_cell(Guild_member.row, 9, "X")
-                Now_member = worksheet.acell('I4').value
+                Now_member = worksheet.acell('J4').value
                 await ctx.channel.send(f'"{dis_name[1]}" 영토전불참 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
