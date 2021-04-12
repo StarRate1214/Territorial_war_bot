@@ -1,0 +1,8 @@
+asyncio
+discord
+os
+gspread
+datetime
+configparser
+json
+ServiceAccountCredentials
