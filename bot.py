@@ -90,7 +90,7 @@ async def ad_looping():
     await client.get_channel(free_channel).send(msg)
     while True:
         if (old_hour != now.hour) & (now.hour in ok_hour):
-            if(now.minute in ok_minute):
+            if(now.minute in ok_minute) & (now.minute in ok_minute):
                 old_hour = now.hour
                 now = datetime.datetime.now()
                 await client.get_channel(free_channel).send(msg)
@@ -234,13 +234,34 @@ async def on_message(ctx):
             if ctx.author.guild_permissions.manage_messages:
                 await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함\n!청소 [숫자] | 청소가 필요한 채널에서 입력시 해당 숫자만큼 메시지 삭제\n!자유말하기 [메시지] | 자유-채팅방에 봇이 메시지를 말함')
 
+if ctx.content.startswith("!영토전늦참"):
+        pic = ctx.content[7:]
+        if pic != '':
+            try:
+                Guild_member = worksheet.find(pic)
+                worksheet.update_cell(Guild_member.row, 10, "△")
+                Now_member = worksheet.acell('J4').value
+                await ctx.channel.send(f'"{pic}" 영토전 늦참됨 [참가인원] {Now_member}명')
+            except:
+                await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
+        else:
+            try:
+                user = ctx.author
+                dis_name = user.display_name.split(" ")
+                Guild_member = worksheet.find(dis_name[1])
+                worksheet.update_cell(Guild_member.row, 10, "△")
+                Now_member = worksheet.acell('J4').value
+                await ctx.channel.send(f'"{dis_name[1]}" 영토전 늦참됨 [참가인원] {Now_member}명')
+            except:
+                await ctx.channel.send(f'"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
+
     if ctx.content.startswith("!영토전참가"):
         pic = ctx.content[7:]
         if pic != '':
             try:
                 Guild_member = worksheet.find(pic)
                 worksheet.update_cell(Guild_member.row, 10, "O")
-                Now_member = worksheet.acell('J').value
+                Now_member = worksheet.acell('J4').value
                 await ctx.channel.send(f'"{pic}" 영토전참가 확인됨 [참가인원] {Now_member}명')
             except:
                 await ctx.channel.send(f'"{pic}" 이름이 없거나 틀림 신규 가문원이라면 <#798112697497157632>에서 확인 후 진행')
