@@ -39,6 +39,8 @@ free_channel = int(config['settings']['I_free_channel'])
 manage_bot_channel = int(config['settings']['I_manage_bot_channel'])
 terrirorial_1_channel = int(config['settings']['I_terrirorial_1_channel'])
 terrirorial_2_channel = int(config['settings']['I_terrirorial_2_channel'])
+rjsdml_channel = int(config['settings']['I_rjsdml_channel'])
+manage_rjsdml_channel = int(config['settings']['I_manage_rjsdml_channel'])
 TOKEN = config['settings']['I_TOKEN']
 json_file_name = config['settings']['I_json_file_name']
 spreadsheet_url = config['settings']['I_spreadsheet_url']
@@ -98,7 +100,14 @@ async def ad_looping():
 async def on_message(ctx):
     if ctx.author == client.user:
         return
-    
+
+    if ctx.channel.id == rjsdml_channel:
+        pic = ctx.content
+        user = ctx.author
+        await ctx.delete()
+        await client.get_channel(rjsdml_channel).send(f"익명 : {pic}")
+        await client.get_channel(manage_rjsdml_channel).send(f"건의자 : {user.display_name}```{pic}```")
+        
     if ctx.content.startswith("!자유말하기"):
         if ctx.guild:
             if ctx.author.guild_permissions.manage_messages:
