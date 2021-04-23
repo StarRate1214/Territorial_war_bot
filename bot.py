@@ -101,6 +101,14 @@ async def on_message(ctx):
     if ctx.author == client.user:
         return
 
+    if ctx.content.startswith("!청소"):
+        if ctx.guild:
+            if ctx.author.guild_permissions.manage_messages:
+                number = int(ctx.content.split(" ")[1])
+                await ctx.delete()
+                await ctx.channel.purge(limit=number)
+                await ctx.channel.send(f"{number}개의 메시지 삭제")
+                
     if ctx.channel.id == rjsdml_channel:
         pic = ctx.content
         user = ctx.author
@@ -183,14 +191,6 @@ async def on_message(ctx):
                 await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
         except Exception as err:
             await client.get_channel(manage_bot_channel).send(err)
-
-    if ctx.content.startswith("!청소"):
-        if ctx.guild:
-            if ctx.author.guild_permissions.manage_messages:
-                number = int(ctx.content.split(" ")[1])
-                await ctx.delete()
-                await ctx.channel.purge(limit=number)
-                await ctx.channel.send(f"{number}개의 메시지 삭제")
 
     if ctx.content.startswith("!병종입력"):
         try:
