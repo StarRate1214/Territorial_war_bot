@@ -64,6 +64,7 @@ doc = gc.open_by_url(spreadsheet_url)
 worksheet = doc.worksheet('병종 시트')
 worksheet_manage = doc.worksheet('영토전-관리용')
 worksheet_army = doc.worksheet('영토전-병종')
+worksheet_event = doc.worksheet('이벤트')
 
 #Guild_member = worksheet.range('D15:D114')
 #print(Guild_member)
@@ -240,6 +241,48 @@ async def on_message(ctx):
             if ctx.author.guild_permissions.manage_messages:
                 await ctx.channel.send('!흥보시작 | 13시-23시 2시간간격 메시지 보냄\n!흥보메시지 [메시지] | 흥보문구 변경\n!흥보종료 | 채널에 메시지보내기를 종료함\n!청소 [숫자] | 청소가 필요한 채널에서 입력시 해당 숫자만큼 메시지 삭제\n!자유말하기 [메시지] | 자유-채팅방에 봇이 메시지를 말함')
     
+    if ctx.content.startswith("!이벤트취소"):
+        pic = ctx.content[7:]
+        if pic != '':
+            try:
+                Guild_member = worksheet_event.find(pic)
+                worksheet_event.update_cell(Guild_member.row, 2, "")
+                Now_member = worksheet_event.acell('b1').value
+                await ctx.channel.send(f'"{pic}" 이벤트취소 확인됨 [참가인원] {Now_member}명')
+            except:
+                await ctx.channel.send(f'"{pic}" 이름없음')
+        else:
+            try:
+                user = ctx.author
+                dis_name = user.display_name.split(" ")
+                Guild_member = worksheet_event.find(dis_name[1])
+                worksheet_event.update_cell(Guild_member.row, 2, "")
+                Now_member = worksheet_event.acell('b1').value
+                await ctx.channel.send(f'"{dis_name[1]}" 이벤트취소 확인됨 [참가인원] {Now_member}명')
+            except:
+                await ctx.channel.send(f'"{dis_name[1]}" 이름없음')
+
+    if ctx.content.startswith("!이벤트참가"):
+        pic = ctx.content[7:]
+        if pic != '':
+            try:
+                Guild_member = worksheet_event.find(pic)
+                worksheet_event.update_cell(Guild_member.row, 2, "O")
+                Now_member = worksheet_event.acell('b1').value
+                await ctx.channel.send(f'"{pic}" 이벤트참가 확인됨 [참가인원] {Now_member}명')
+            except:
+                await ctx.channel.send(f'"{pic}" 이름없음')
+        else:
+            try:
+                user = ctx.author
+                dis_name = user.display_name.split(" ")
+                Guild_member = worksheet_event.find(dis_name[1])
+                worksheet_event.update_cell(Guild_member.row, 2, "O")
+                Now_member = worksheet_event.acell('b1').value
+                await ctx.channel.send(f'"{dis_name[1]}" 이벤트참가 확인됨 [참가인원] {Now_member}명')
+            except:
+                await ctx.channel.send(f'"{dis_name[1]}" 이름없음')
+
     if ctx.content.startswith("!영토전늦참"):
         pic = ctx.content[7:]
         if pic != '':
