@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-##################################### 서버용  #########################################
+##################################### 서버용 ############################################
 #########################################################################################
 #########################################################################################
 #########################################################################################
@@ -115,22 +115,13 @@ async def _help(ctx):
 async def _severHelp(ctx):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.channel.send('!흥보 [시작|종료] | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 (메시지) | 흥보문구 변경\n!자유말하기 [메시지] | 자유-채팅방에 봇이 메시지를 말함')
+            await ctx.channel.send('!흥보 [시작|종료] | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 (메시지) | 흥보문구 변경\n!공지 #채널명 [메시지]')
 
-# async def _terrirorial(ctx):
-#     role = ctx.guild.get_role(813827862649372673)
-#     print(role)
-#     print(role.members)
-#     # Going through every member and pinging him
-#     for member in role.members:
-#         await ctx.send(member.mention)
-#guild = ctx.message.guild 서버이름
-
-@client.command(name="자유채팅", pass_context=True)
-async def _freeChat(ctx, *, args):
-        if ctx.guild:
-            if ctx.author.guild_permissions.manage_messages:
-                await client.get_channel(free_channel).send(args)
+@client.command(name="공지", pass_context=True)
+@commands.has_permissions(manage_messages=True)
+async def _notion(ctx, channal, *, args):
+    channal = int(channal[2:-1])
+    await client.get_channel(channal).send(args)
 
 #!가입 이름 가문 레벨 무기 가입상태
 #!가입 1등항해사 [검산|검해] 300 창 [O|X]
