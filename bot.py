@@ -128,7 +128,7 @@ async def _notion(ctx, channal, *, args):
 @client.command(name="가입", pass_context=True)
 async def join(ctx, name, guild, level):
     member = ctx.message.author
-    if guild == "검산" or guild == "검해" or guild == "검천":
+    if guild == "검산" or guild == "검해" or guild == "검천" or guild == "검훈":
         await member.add_roles(get(ctx.guild.roles, name='가문원['+ guild +']'))
         await ctx.channel.send(f'<@{member.id}> <#812693168981540864> 읽어주시고 아래 엄지척:thumbsup: 이모지 반응 눌러주세요!')
         full_name = guild + " " + name + " " + level
