@@ -126,15 +126,20 @@ async def _notion(ctx, channal, *, args):
 #!가입 이름 가문 레벨 무기 가입상태
 #!가입 1등항해사 [검산|검해] 300 창 [O|X]
 @client.command(name="가입", pass_context=True)
-async def _join(ctx, name, guild, level):
-    author = ctx.author
-    full_name = guild + " " + name + " " + level
-    try:
-        await author.edit(nick=full_name)
-        if name:
-            await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
-    except Exception as err:
-        await client.get_channel(manage_bot_channel).send(err)
+async def join(ctx, name, guild, level):
+    member = ctx.message.author
+    if guild == "검산" or guild == "검해" or guild == "검천":
+        await member.add_roles(get(ctx.guild.roles, name='가문원['+ guild +']'))
+        await ctx.channel.send(f'<@{member.id}> <#812693168981540864> 읽어주시고 아래 엄지척:thumbsup: 이모지 반응 눌러주세요!')
+        full_name = guild + " " + name + " " + level
+        try:
+            await member.edit(nick=full_name)
+            if name:
+                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
+        except Exception as err:
+            await client.get_channel(manage_bot_channel).send(err)
+    else:
+        await ctx.channel.send(f'<@{member.id}> 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문(검산,검해,검천) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
 
 @client.command(name="영토전", pass_context=True)
 async def _terrirorial(ctx, status, member: discord.Member=None):
