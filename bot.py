@@ -18,6 +18,7 @@
 #########################################################################################
 
 import asyncio
+from asyncio.windows_events import NULL
 import discord
 import os
 from discord import message
@@ -99,6 +100,9 @@ async def ad_looping():
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
+async def dis_Member(user: discord.member):
+    return user
+
 #에러 처리
 @client.event
 async def on_command_error(ctx, error):
@@ -108,14 +112,14 @@ async def on_command_error(ctx, error):
 #도움
 @client.command(name="도움", pass_context=True)
 async def _help(ctx):
-    await ctx.channel.send('!가입 이름 가문[검산|검해] 레벨 주무기 가입상태[O|X] \n!영토전 [참가|늦참|불참] (@이름)')
+    await ctx.channel.send('!가입 이름 (검산,검해,검천,검훈) 레벨\n!영토전 [참가|늦참|불참] (@이름)')
 
 #서버도움
 @client.command(name="서버도움", pass_context=True)
 async def _severHelp(ctx):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.channel.send('!흥보 [시작|종료] | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 (메시지) | 흥보문구 변경\n!공지 #채널명 [메시지]')
+            await ctx.channel.send('!흥보 [시작|종료] | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 (메시지) | 흥보문구 변경\n!자유말하기 [메시지] | 자유-채팅방에 봇이 메시지를 말함')
 
 @client.command(name="공지", pass_context=True)
 @commands.has_permissions(manage_messages=True)
@@ -126,25 +130,37 @@ async def _notion(ctx, channal, *, args):
 #!가입 이름 가문 레벨 무기 가입상태
 #!가입 1등항해사 [검산|검해] 300 창 [O|X]
 @client.command(name="가입", pass_context=True)
-async def join(ctx, name, guild, level):
+async def _join(ctx, name, guild, level):
+    if ctx.author.guild_permissions.manage_messages:
+        return
+
     member = ctx.message.author
+    rankValue = "빈 셀"
+    voidColumn = 3 #직위 위치
     if guild == "검산" or guild == "검해" or guild == "검천" or guild == "검훈":
-        await member.add_roles(get(ctx.guild.roles, name='가문원['+ guild +']'))
-        await ctx.channel.send(f'<@{member.id}> <#812693168981540864> 읽어주시고 아래 엄지척:thumbsup: 이모지 반응 눌러주세요!')
         full_name = guild + " " + name + " " + level
         try:
             await member.edit(nick=full_name)
-            if name:
-                await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! \"{name}\"")
+            await member.add_roles(get(ctx.guild.roles, name='가문원['+ guild +']'))
+            try:
+                Guild_member = worksheet.find(name) #이름 찾기
+                worksheet.update_cell(col=voidColumn,row=Guild_member.row,value='가문원['+ guild +']')
+            except:
+                voidValue = worksheet.find(rankValue,in_column=voidColumn)
+                worksheet.update_cell(col=voidColumn,row=voidValue.row,value='가문원['+ guild +']') #직위 추가
+                worksheet.update_cell(col=voidColumn+1,row=voidValue.row,value=name) #이름 추가
+            
+            await ctx.channel.send(f'<@{member.id}> <#812693168981540864> 읽어주시고 아래 엄지척:thumbsup: 이모지 반응 눌러주세요!\n처음이시면 <#873457208174719026> 꼭! 읽어주시기 바랍니다')
+            await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! <@{member.id}> = \"{name}\"")    
         except Exception as err:
             await client.get_channel(manage_bot_channel).send(err)
     else:
-        await ctx.channel.send(f'<@{member.id}> 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문(검산,검해,검천) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
+        await ctx.channel.send(f'<@{member.id}> 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문(검산,검해,검천,검훈) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
 
 @client.command(name="영토전", pass_context=True)
 async def _terrirorial(ctx, status, member: discord.Member=None):
     member = member or ctx.message.author
-
+    terriCol = 10 #영토전 참가여부 위치
     if status == "참가":
         yesno = "O"
     elif status == "늦참":
@@ -159,11 +175,11 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
         member = member or ctx.message.author
         dis_name = member.display_name.split(" ")
         Guild_member = worksheet.find(dis_name[1])
-        worksheet.update_cell(Guild_member.row, 10, yesno)
+        worksheet.update_cell(Guild_member.row, terriCol, yesno)
         Now_member = worksheet.acell('J4').value
-        await ctx.channel.send(f'"{dis_name[1]}" 영토전 {status} 확인됨 [참가인원] {Now_member}명')
+        await ctx.channel.send(f'<@{member.id}>"{dis_name[1]}" 영토전 {status} 확인됨 [참가인원] {Now_member}명')
     except:
-        await ctx.channel.send(f'"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
+        await ctx.channel.send(f'<@{member.id}>"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
 
     if status == "참가":
         await member.add_roles(get(ctx.guild.roles, name="영토전참가자")) #역할 부여
