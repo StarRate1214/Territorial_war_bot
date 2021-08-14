@@ -18,7 +18,6 @@
 #########################################################################################
 
 import asyncio
-from asyncio.windows_events import NULL
 import discord
 import os
 from discord import message
