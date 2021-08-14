@@ -100,9 +100,6 @@ async def ad_looping():
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
-#async def dis_Member(user: discord.member):
-#    return user
-
 #에러 처리
 @client.event
 async def on_command_error(ctx, error):
@@ -111,26 +108,26 @@ async def on_command_error(ctx, error):
 
 #도움
 @client.command(name="도움", pass_context=True)
-async def _help(ctx):
+async def help(ctx):
     await ctx.channel.send('!가입 이름 (검산,검해,검천,검훈) 레벨\n!영토전 [참가|늦참|불참] (@이름)')
 
 #서버도움
 @client.command(name="서버도움", pass_context=True)
-async def _severHelp(ctx):
+async def severHelp(ctx):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
             await ctx.channel.send('!흥보 [시작|종료] | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 (메시지) | 흥보문구 변경\n!공지 #채널명 [메시지]')
-            
+
 @client.command(name="공지", pass_context=True)
 @commands.has_permissions(manage_messages=True)
-async def _notion(ctx, channal, *, args):
+async def notion(ctx, channal, *, args):
     channal = int(channal[2:-1])
     await client.get_channel(channal).send(args)
 
 #!가입 이름 가문 레벨 무기 가입상태
 #!가입 1등항해사 [검산|검해] 300 창 [O|X]
 @client.command(name="가입", pass_context=True)
-async def _join(ctx, name, guild, level):
+async def join(ctx, name, guild, level):
     if ctx.author.guild_permissions.manage_messages:
         return
 
@@ -158,7 +155,7 @@ async def _join(ctx, name, guild, level):
         await ctx.channel.send(f'<@{member.id}> 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문(검산,검해,검천,검훈) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
 
 @client.command(name="영토전", pass_context=True)
-async def _terrirorial(ctx, status, member: discord.Member=None):
+async def terrirorial(ctx, status, member: discord.Member=None):
     member = member or ctx.message.author
     terriCol = 10 #영토전 참가여부 위치
     if status == "참가":
@@ -204,7 +201,7 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
         return
 
 @client.command(name="홍보", pass_context=True)
-async def _promotion(ctx, status, *, adcontent):
+async def promotion(ctx, status, *, adcontent):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
             if status == "시작":
