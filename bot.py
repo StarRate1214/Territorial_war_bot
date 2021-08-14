@@ -119,8 +119,8 @@ async def _help(ctx):
 async def _severHelp(ctx):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.channel.send('!흥보 [시작|종료] | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 (메시지) | 흥보문구 변경\n!자유말하기 [메시지] | 자유-채팅방에 봇이 메시지를 말함')
-
+            await ctx.channel.send('!흥보 [시작|종료] | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 (메시지) | 흥보문구 변경\n!공지 #채널명 [메시지]')
+            
 @client.command(name="공지", pass_context=True)
 @commands.has_permissions(manage_messages=True)
 async def _notion(ctx, channal, *, args):
