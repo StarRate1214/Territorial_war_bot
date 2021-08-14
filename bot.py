@@ -100,8 +100,8 @@ async def ad_looping():
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
-async def dis_Member(user: discord.member):
-    return user
+#async def dis_Member(user: discord.member):
+#    return user
 
 #에러 처리
 @client.event
