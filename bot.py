@@ -105,7 +105,7 @@ async def ad_looping():
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
-# # 에러 처리
+# 에러 처리
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
@@ -114,7 +114,7 @@ async def on_command_error(ctx, error):
 # !도움
 @bot.command(name="도움", pass_context=True)
 async def _help(ctx):
-    await ctx.channel.send('!가입 이름 가문명(검산,검해,검천,검훈) 레벨\n!영토전 (참가,늦참,불참) (@이름)\n!출석 (@이름)')
+    await ctx.channel.send('!가입 이름 가문명(검산,검해,검천,검훈) 레벨\n!영토전 (참가,늦참,불참) (@이름)\n!출첵 (@이름)')
     return
 
 # !서버도움
@@ -221,7 +221,7 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
         return
 
 # !출첵 (@이름)
-@bot.command(name="출석", pass_context=True)
+@bot.command(name="출첵", pass_context=True)
 async def _attendance(ctx, member: discord.Member=None):
     member = member or ctx.message.author
     now = datetime.datetime.now()
