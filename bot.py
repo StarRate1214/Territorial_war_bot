@@ -231,8 +231,8 @@ async def _attendance(ctx, member: discord.Member=None):
             time = str(now)
             dis_name = member.display_name.split(" ")
             Guild_member = worksheet_attendance.find(dis_name[1])#이름 찾기
-            worksheet_attendance.update_cell(col=2, row=Guild_member.row, value='TRUE')
-            worksheet_attendance.update_cell(col=3, row=Guild_member.row, value=time)
+            worksheet.update_cell(col=53, row=Guild_member.row, value='TRUE')
+            worksheet.update_cell(col=54, row=Guild_member.row, value=time)
             await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
         except:
             await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
