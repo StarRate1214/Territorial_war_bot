@@ -50,7 +50,6 @@ spreadsheet_url = config['settings']['I_spreadsheet_url']
 msg = config['settings']['I_msg']
 ok_hour = config['settings']['I_ok_hour']
 ok_hour = json.loads(ok_hour)
-terrirorial_members = config['settings']['I_terrirorial_members']
 
 scope = [
     'https://spreadsheets.google.com/feeds',
@@ -68,21 +67,23 @@ doc = gc.open_by_url(spreadsheet_url)
 worksheet = doc.worksheet('병종 시트')
 worksheet_manage = doc.worksheet('영토전-관리용')
 worksheet_army = doc.worksheet('영토전-병종')
-#worksheet_event = doc.worksheet('이벤트')
 
-#Guild_member = worksheet.range('D15:D114')
-#print(Guild_member)
+intents = discord.Intents.default() 
+intents.members = True #sets `intents.members`
+bot = commands.Bot(
+    command_prefix="!", 
+    intents=intents, # load the intents into commands.Bot
+    help_command=None
+)
 
-client = commands.Bot(command_prefix="!", help_command=None)
-
-@client.event
+@bot.event
 async def on_ready():  # 봇이 실행 준비가 되었을 때 행동할 것
     print('Logged in as')
-    print(client.user.name)  # 클라이언트의 유저 이름을 출력합니다.
-    print(client.user.id)  # 클라이언트의 유저 고유 ID를 출력합니다.
+    print(bot.user.name)  # 클라이언트의 유저 이름을 출력합니다.
+    print(bot.user.id)  # 클라이언트의 유저 고유 ID를 출력합니다.
     # 고유 ID는 모든 유저 및 봇이 가지고있는 숫자만으로 이루어진 ID입니다.
     print('------')
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('"!도움" 도움말 호출'))
+    await bot.change_presence(status=discord.Status.online, activity=discord.Game('"!도움" 도움말을 볼 수 있습니다. '))
 
   # GMT 기준으로 측정되나봄 +9시간
 loop = asyncio.get_event_loop
@@ -90,45 +91,49 @@ loop = asyncio.get_event_loop
 async def ad_looping():
     now = datetime.datetime.now()
     old_hour = now.hour
-    await client.get_channel(free_channel).send(msg)
+    await bot.get_channel(free_channel).send(msg)
     while True:
         if (old_hour != now.hour) & (now.hour in ok_hour):
             old_hour = now.hour
             now = datetime.datetime.now()
-            await client.get_channel(free_channel).send(msg)
+            await bot.get_channel(free_channel).send(msg)
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
-#에러 처리
-@client.event
+# 에러 처리
+@bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return
 
-#도움
-@client.command(name="도움", pass_context=True)
-async def help(ctx):
-    await ctx.channel.send('!가입 이름 (검산,검해,검천,검훈) 레벨\n!영토전 [참가|늦참|불참] (@이름)')
+# !도움
+@bot.command(name="도움", pass_context=True)
+async def _help(ctx):
+    await ctx.channel.send('!가입 이름 가문명(검산,검해,검천,검훈) 레벨\n!영토전 (참가,늦참,불참) (@이름)')
+    return
 
-#서버도움
-@client.command(name="서버도움", pass_context=True)
-async def severHelp(ctx):
+# !서버도움
+@bot.command(name="서버도움", pass_context=True)
+async def _severHelp(ctx):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.channel.send('!흥보 [시작|종료] | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 (메시지) | 흥보문구 변경\n!공지 #채널명 [메시지]')
+            await ctx.channel.send('!흥보 (시작,종료) | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 [메시지] | 흥보문구 변경\n!공지 (#채널명) [메시지] | 자유-채팅방에 봇이 메시지를 말함')
+    return
 
-@client.command(name="공지", pass_context=True)
+# !공지 #채널명 메시지
+@bot.command(name="공지", pass_context=True)
 @commands.has_permissions(manage_messages=True)
-async def notion(ctx, channal, *, args):
+async def _notion(ctx, channal, *, args):
     channal = int(channal[2:-1])
-    await client.get_channel(channal).send(args)
+    await bot.get_channel(channal).send(args)
+    return
 
-#!가입 이름 가문 레벨 무기 가입상태
-#!가입 1등항해사 [검산|검해] 300 창 [O|X]
-@client.command(name="가입", pass_context=True)
-async def join(ctx, name, guild, level):
-    if ctx.author.guild_permissions.manage_messages:
-        return
+# !가입 이름 가문명 레벨 무기 가입상태
+@bot.command(name="가입", pass_context=True)
+async def _join(ctx, name, guild, level):
+    if ctx.guild:
+        if ctx.author.guild_permissions.manage_messages:
+            return
 
     member = ctx.message.author
     rankValue = "빈 셀"
@@ -146,16 +151,19 @@ async def join(ctx, name, guild, level):
                 worksheet.update_cell(col=voidColumn,row=voidValue.row,value='가문원['+ guild +']') #직위 추가
                 worksheet.update_cell(col=voidColumn+1,row=voidValue.row,value=name) #이름 추가
             
-            await ctx.channel.send(f'<@{member.id}> <#812693168981540864> 읽어주시고 아래 엄지척:thumbsup: 이모지 반응 눌러주세요!\n처음이시면 <#873457208174719026> 꼭! 읽어주시기 바랍니다')
-            await client.get_channel(manage_bot_channel).send(f"새로운 가문원 등장! <@{member.id}> = \"{name}\"")    
+            await ctx.channel.send(f'환영합니다. <@{member.id}>님 <#812693168981540864> 읽어주시고 아래 엄지척:thumbsup: 이모지 반응 눌러주세요!\n처음이시면 <#873457208174719026> 꼭! 읽어주시기 바랍니다')
+            await bot.get_channel(manage_bot_channel).send(f'새로운 가문원 등장! <@{member.id}> = \"{name}\"')    
         except Exception as err:
-            await client.get_channel(manage_bot_channel).send(err)
+            await bot.get_channel(manage_bot_channel).send(err)
     else:
-        await ctx.channel.send(f'<@{member.id}> 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문(검산,검해,검천,검훈) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
+        await ctx.channel.send(f'<@{member.id}>님 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문명(검산,검해,검천,검훈) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
+    return
 
-@client.command(name="영토전", pass_context=True)
-async def terrirorial(ctx, status, member: discord.Member=None):
+# !영토전 (참가,늦참,불참) (@이름)
+@bot.command(name="영토전", pass_context=True)
+async def _terrirorial(ctx, status, member: discord.Member=None):
     member = member or ctx.message.author
+    guild = ctx.guild
     terriCol = 10 #영토전 참가여부 위치
     if status == "참가":
         yesno = "O"
@@ -164,9 +172,18 @@ async def terrirorial(ctx, status, member: discord.Member=None):
     elif status == "불참":
         yesno = "X"
     elif status == "종료":
-        if ctx.guild:
-            if ctx.author.guild_permissions.manage_messages:
-                print("영토전 종료")
+        if guild:
+            if ctx.author.guild_permissions.manage_roles:
+                role = get(guild.roles, name="영토전참가자")
+                await ctx.channel.send(f'영토전이 종료되었습니다. ')
+                for member in guild.members:
+                    if role in member.roles:
+                        await member.remove_roles(role)                
+                await ctx.channel.send(f'<@&876493974133690418><@&876493974133690418><@&876493974133690418><@&876493974133690418> 역할 제거가 완료 되었습니다. \n영토전 참가신청 부탁드립니다.')
+            else:
+                await ctx.channel.send(f'<@{member.id}> 영토전을 종료할 권한이 없습니다.')
+                return
+
     try:
         member = member or ctx.message.author
         dis_name = member.display_name.split(" ")
@@ -178,33 +195,22 @@ async def terrirorial(ctx, status, member: discord.Member=None):
         await ctx.channel.send(f'<@{member.id}>"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
 
     if status == "참가":
-        await member.add_roles(get(ctx.guild.roles, name="영토전참가자")) #역할 부여
-        terrirorial_members = config['settings']['I_terrirorial_members']
-        terrirorial_members = terrirorial_members +', \"'+ str(member.id) +'\"'#문자열 끝에 추가
-        config.set('settings', 'I_terrirorial_members', terrirorial_members)
-        with open(END_FILE, 'w', encoding="utf8") as configfile: #파일 입력
-            config.write(configfile)
-        
+        await member.add_roles(get(guild.roles, name="영토전참가자")) #역할 부여
     elif status == "늦참":
-        await member.add_roles(get(ctx.guild.roles, name="영토전참가자"))
-        terrirorial_members = config['settings']['I_terrirorial_members']
-        terrirorial_members = terrirorial_members +', \"'+ str(member.id) +'\"'#문자열 끝에 추가
-        config.set('settings', 'I_terrirorial_members', terrirorial_members)
-        with open(END_FILE, 'w', encoding="utf8") as configfile: #파일 입력
-            config.write(configfile)
-
+        await member.add_roles(get(guild.roles, name="영토전참가자"))
     elif status == "불참":
-        await member.remove_roles(get(ctx.guild.roles, name="영토전참가자"))
+        await member.remove_roles(get(guild.roles, name="영토전참가자"))
 
     else:
         return
 
-@client.command(name="홍보", pass_context=True)
-async def promotion(ctx, status, *, adcontent):
+# !흥보 (시작,종료) | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 [메시지]
+@bot.command(name="홍보", pass_context=True)
+async def _promotion(ctx, status, *, adcontent):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
             if status == "시작":
-                ad_task = client.loop.create_task(ad_looping())                    
+                ad_task = bot.loop.create_task(ad_looping())                    
                 await ctx.channel.send(f'지금부터 영토전 홍보를 시작함 13시-23시 2시간간격')
                 print("홍보 시작")
             elif status == "종료":
@@ -222,12 +228,13 @@ async def promotion(ctx, status, *, adcontent):
             else:
                 return
 
-@client.event 
+# 과거 command 이용없이 하드코딩한거
+@bot.event 
 async def on_message(ctx):
-    await client.process_commands(ctx)
+    await bot.process_commands(ctx)
     if ctx.author.bot:
         return None
-    if ctx.author == client.user:
+    if ctx.author == bot.user:
         return
 
-client.run(TOKEN)
+bot.run(TOKEN)
