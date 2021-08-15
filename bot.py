@@ -33,6 +33,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 global ad_task
 global msg
 global terrirorial_members
+global teCheck
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 END_FILE = BASE_DIR+'\\..\\config.ini'
@@ -47,10 +48,11 @@ terrirorial_2_channel = int(config['settings']['I_terrirorial_2_channel'])#영�
 TOKEN = config['settings']['I_TOKEN']
 json_file_name = config['settings']['I_json_file_name']
 spreadsheet_url = config['settings']['I_spreadsheet_url']
+spreadsheet_url2 = config['settings']['I_spreadsheet_url2']
 msg = config['settings']['I_msg']
 ok_hour = config['settings']['I_ok_hour']
 ok_hour = json.loads(ok_hour)
-
+teCheck = '종료'
 scope = [
     'https://spreadsheets.google.com/feeds',
     'https://www.googleapis.com/auth/drive',
@@ -62,11 +64,14 @@ gc = gspread.authorize(credentials)
 
 # 스프레스시트 문서 가져오기
 doc = gc.open_by_url(spreadsheet_url)
+doc2 = gc.open_by_url(spreadsheet_url2)
 
 # 시트 선택하기
 worksheet = doc.worksheet('병종 시트')
 worksheet_manage = doc.worksheet('영토전-관리용')
 worksheet_army = doc.worksheet('영토전-병종')
+worksheet_attendance = doc2.worksheet('출석부')
+
 
 intents = discord.Intents.default() 
 intents.members = True #sets `intents.members`
@@ -100,16 +105,16 @@ async def ad_looping():
         await asyncio.sleep(60)
         now = datetime.datetime.now()
 
-# 에러 처리
-@bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        return
+# # 에러 처리
+# @bot.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, commands.CommandNotFound):
+#         return
 
 # !도움
 @bot.command(name="도움", pass_context=True)
 async def _help(ctx):
-    await ctx.channel.send('!가입 이름 가문명(검산,검해,검천,검훈) 레벨\n!영토전 (참가,늦참,불참) (@이름)')
+    await ctx.channel.send('!가입 이름 가문명(검산,검해,검천,검훈) 레벨\n!영토전 (참가,늦참,불참) (@이름)\n!출석 (@이름)')
     return
 
 # !서버도움
@@ -117,7 +122,7 @@ async def _help(ctx):
 async def _severHelp(ctx):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.channel.send('!흥보 (시작,종료) | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 [메시지] | 흥보문구 변경\n!공지 (#채널명) [메시지] | 자유-채팅방에 봇이 메시지를 말함')
+            await ctx.channel.send('!흥보 (시작,종료) | 13시-23시 1시간 간격으로 메시지 보냄\n!흥보 문구 [메시지] | 흥보문구 변경\n!공지 (#채널명) [메시지] | 채팅방에 봇이 메시지를 말함\n!영토전 (종료,출석)')
     return
 
 # !공지 #채널명 메시지
@@ -162,6 +167,7 @@ async def _join(ctx, name, guild, level):
 # !영토전 (참가,늦참,불참) (@이름)
 @bot.command(name="영토전", pass_context=True)
 async def _terrirorial(ctx, status, member: discord.Member=None):
+    global teCheck
     member = member or ctx.message.author
     guild = ctx.guild
     terriCol = 10 #영토전 참가여부 위치
@@ -174,25 +180,35 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
     elif status == "종료":
         if guild:
             if ctx.author.guild_permissions.manage_roles:
+                teCheck = status
                 role = get(guild.roles, name="영토전참가자")
-                await ctx.channel.send(f'영토전이 종료되었습니다. ')
+                await ctx.channel.send(f'```----------- 영토전이 종료되었습니다. -----------```')
+                await bot.get_channel(free_channel).send(f'```----------- 영토전이 종료되었습니다. -----------```')
                 for member in guild.members:
                     if role in member.roles:
                         await member.remove_roles(role)                
-                await ctx.channel.send(f'<@&876493974133690418><@&876493974133690418><@&876493974133690418><@&876493974133690418> 역할 제거가 완료 되었습니다. \n영토전 참가신청 부탁드립니다.')
+                await ctx.channel.send(f'역할 제거가 완료 되었습니다.')
+                await bot.get_channel(free_channel).send(f'<@&876493974133690418><@&876493974133690418><@&876493974133690418><@&876493974133690418> 영토전 참가신청 부탁드립니다.')
             else:
                 await ctx.channel.send(f'<@{member.id}> 영토전을 종료할 권한이 없습니다.')
                 return
+    elif status == "출석":
+        if guild:
+            if ctx.author.guild_permissions.manage_roles:
+                teCheck = status
+                print(teCheck)
+                await ctx.channel.send('```----------- 금일 영토전 출석 시작 -----------```<#876548929968275486>에서 !출석 (@이름)')
+                await bot.get_channel(free_channel).send('```----------- 금일 영토전 출석 시작 -----------```<#876548929968275486>에서 !출석 (@이름)')                
+                return
 
     try:
-        member = member or ctx.message.author
         dis_name = member.display_name.split(" ")
         Guild_member = worksheet.find(dis_name[1])
         worksheet.update_cell(Guild_member.row, terriCol, yesno)
         Now_member = worksheet.acell('J4').value
-        await ctx.channel.send(f'<@{member.id}>"{dis_name[1]}" 영토전 {status} 확인됨 [참가인원] {Now_member}명')
+        await ctx.channel.send(f'<@{member.id}> "{dis_name[1]}" 영토전 {status} 확인됨 [참가인원] {Now_member}명')
     except:
-        await ctx.channel.send(f'<@{member.id}>"{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
+        await ctx.channel.send(f'<@{member.id}> "{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
 
     if status == "참가":
         await member.add_roles(get(guild.roles, name="영토전참가자")) #역할 부여
@@ -203,6 +219,29 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
 
     else:
         return
+
+# !출첵 (@이름)
+@bot.command(name="출석", pass_context=True)
+async def _attendance(ctx, member: discord.Member=None):
+    member = member or ctx.message.author
+    now = datetime.datetime.now()
+    week = now.isoweekday()
+    hour = now.hour
+    if teCheck == "출석" or (week == 1 or week == 6):
+        if hour >= 20 and hour <= 23:
+                try:
+                    time = str(now)
+                    dis_name = member.display_name.split(" ")
+                    Guild_member = worksheet_attendance.find(dis_name[1])#이름 찾기
+                    worksheet_attendance.update_cell(col=2, row=Guild_member.row, value='TRUE')
+                    worksheet_attendance.update_cell(col=3, row=Guild_member.row, value=time)
+                    await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
+                except:
+                    await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
+        return
+    else:
+        await ctx.channel.send(f'<@{member.id}>님 지금은 출석시간 아닙니다.')
+    return
 
 # !흥보 (시작,종료) | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 [메시지]
 @bot.command(name="홍보", pass_context=True)
