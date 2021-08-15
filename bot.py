@@ -192,7 +192,7 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
             else:
                 await ctx.channel.send(f'<@{member.id}> 영토전을 종료할 권한이 없습니다.')
                 return
-    elif status == "출석":
+    elif status == "출석" or "시작":
         if guild:
             if ctx.author.guild_permissions.manage_roles:
                 teCheck = status
@@ -216,7 +216,6 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
         await member.add_roles(get(guild.roles, name="영토전참가자"))
     elif status == "불참":
         await member.remove_roles(get(guild.roles, name="영토전참가자"))
-
     else:
         return
 
@@ -227,18 +226,16 @@ async def _attendance(ctx, member: discord.Member=None):
     now = datetime.datetime.now()
     week = now.isoweekday()
     hour = now.hour
-    if teCheck == "출석" or (week == 1 or week == 6):
-        if hour >= 20 and hour <= 23:
-                try:
-                    time = str(now)
-                    dis_name = member.display_name.split(" ")
-                    Guild_member = worksheet_attendance.find(dis_name[1])#이름 찾기
-                    worksheet_attendance.update_cell(col=2, row=Guild_member.row, value='TRUE')
-                    worksheet_attendance.update_cell(col=3, row=Guild_member.row, value=time)
-                    await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
-                except:
-                    await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
-        return
+    if teCheck == ("출석" or "시작") or ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
+        try:
+            time = str(now)
+            dis_name = member.display_name.split(" ")
+            Guild_member = worksheet_attendance.find(dis_name[1])#이름 찾기
+            worksheet_attendance.update_cell(col=2, row=Guild_member.row, value='TRUE')
+            worksheet_attendance.update_cell(col=3, row=Guild_member.row, value=time)
+            await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
+        except:
+            await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
     else:
         await ctx.channel.send(f'<@{member.id}>님 지금은 출석시간 아닙니다.')
     return
