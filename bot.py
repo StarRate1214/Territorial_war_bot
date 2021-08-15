@@ -197,8 +197,8 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
             if ctx.author.guild_permissions.manage_roles:
                 teCheck = status
                 print(teCheck)
-                await ctx.channel.send('```----------- 금일 영토전 출석 시작 -----------```<#876548929968275486>에서 !출석 (@이름)')
-                await bot.get_channel(free_channel).send('```----------- 금일 영토전 출석 시작 -----------```<#876548929968275486>에서 !출석 (@이름)')                
+                await ctx.channel.send('```----------- 금일 영토전 출석 시작 -----------```<#876548929968275486>에서 !출첵 (@이름)')
+                await bot.get_channel(free_channel).send('```----------- 금일 영토전 출석 시작 -----------```<#876548929968275486>에서 !출첵 (@이름)')                
                 return
 
     try:
@@ -226,13 +226,13 @@ async def _attendance(ctx, member: discord.Member=None):
     now = datetime.datetime.now()
     week = now.isoweekday()
     hour = now.hour
-    if teCheck == ("출석" or "시작") or ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
+    if teCheck == "출석" or "시작" or ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
         try:
             time = str(now)
             dis_name = member.display_name.split(" ")
-            Guild_member = worksheet_attendance.find(dis_name[1])#이름 찾기
-            worksheet.update_cell(col=53, row=Guild_member.row, value='TRUE')
-            worksheet.update_cell(col=54, row=Guild_member.row, value=time)
+            Guild_member = worksheet.find(dis_name[1])#이름 찾기
+            worksheet.update_cell(col=79, row=Guild_member.row, value='TRUE')
+            worksheet.update_cell(col=80, row=Guild_member.row, value=time)
             await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
         except:
             await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
