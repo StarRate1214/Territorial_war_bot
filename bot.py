@@ -106,10 +106,10 @@ async def ad_looping():
         now = datetime.datetime.now()
 
 # # 에러 처리
-# @bot.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.CommandNotFound):
-#         return
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        return
 
 # !도움
 @bot.command(name="도움", pass_context=True)
