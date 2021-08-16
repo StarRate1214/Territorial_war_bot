@@ -175,7 +175,7 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
         yesno = "O"
     elif status == "늦참":
         yesno = "△"
-    elif status == "불참":
+    elif status == "불참":  
         yesno = "X"
     elif status == "종료":
         if guild:
@@ -222,22 +222,23 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
 # !출첵 (@이름)
 @bot.command(name="출첵", pass_context=True)
 async def _attendance(ctx, member: discord.Member=None):
-    member = member or ctx.message.author
-    now = datetime.datetime.now()
-    week = now.isoweekday()
-    hour = now.hour
-    if teCheck == "출석" or "시작" or ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
-        try:
-            time = str(now)
-            dis_name = member.display_name.split(" ")
-            Guild_member = worksheet.find(dis_name[1])#이름 찾기
-            worksheet.update_cell(col=79, row=Guild_member.row, value='TRUE')
-            worksheet.update_cell(col=80, row=Guild_member.row, value=time)
-            await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
-        except:
-            await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
-    else:
-        await ctx.channel.send(f'<@{member.id}>님 지금은 출석시간 아닙니다.')
+    if ctx.channel == 876548929968275486:
+        member = member or ctx.message.author
+        now = datetime.datetime.now()
+        week = now.isoweekday()
+        hour = now.hour
+        if teCheck == "출석" or "시작" or ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
+            try:
+                time = str(now)
+                dis_name = member.display_name.split(" ")
+                Guild_member = worksheet.find(dis_name[1])#이름 찾기
+                worksheet.update_cell(col=79, row=Guild_member.row, value='TRUE')
+                worksheet.update_cell(col=80, row=Guild_member.row, value=time)
+                await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
+            except:
+                await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
+        else:
+            await ctx.channel.send(f'<@{member.id}>님 지금은 출석시간 아닙니다.')
     return
 
 # !흥보 (시작,종료) | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 [메시지]
