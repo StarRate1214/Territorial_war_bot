@@ -206,13 +206,12 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
             if ctx.author.guild_permissions.manage_roles:
                 teCheck = status
                 role = get(guild.roles, name="영토전참가자")
-                await ctx.channel.send(f'```----------- 영토전이 종료되었습니다. -----------```')
-                await bot.get_channel(free_channel).send(f'```----------- 영토전이 종료되었습니다. -----------```')
+                await ctx.channel.send(f'```----------- 역할 제거가 시작 되었습니다. -----------```')
                 for member in guild.members:
                     if role in member.roles:
-                        await member.remove_roles(role)                
-                await ctx.channel.send(f'역할 제거가 완료 되었습니다.')
-                await bot.get_channel(free_channel).send(f'<@&876493974133690418><@&876493974133690418><@&876493974133690418><@&876493974133690418> 영토전 참가신청 부탁드립니다.')
+                        await member.remove_roles(role)
+                await bot.get_channel(free_channel).send(f'```----------- 영토전이 종료되었습니다. -----------```\n <@&797871681540063252><@&814180836437786634><@&874648461281218631><@&875700120031748146> 영토전 참가신청 부탁드립니다.')                
+                await ctx.channel.send(f'역할 제거가 완료 되었습니다.')              
             else:
                 await ctx.channel.send(f'<@{member.id}> 영토전을 종료할 권한이 없습니다.')
                 return
@@ -228,7 +227,8 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
     try:
         dis_name = member.display_name.split(" ")
         Guild_member = worksheet.find(dis_name[1])
-        worksheet.update_cell(Guild_member.row, terriCol, yesno)
+        worksheet.update_cell(col=terriCol, row = Guild_member.row, value = yesno)
+        worksheet.update_cell(col=78, row = Guild_member.row, value = yesno)
         Now_member = worksheet.acell('J4').value
         await ctx.channel.send(f'<@{member.id}> "{dis_name[1]}" 영토전 {status} 확인됨 [참가인원] {Now_member}명')
     except:
@@ -257,13 +257,10 @@ async def _attendance(ctx, member: discord.Member=None):
             try:
                 time = str(now)
                 dis_name = member.display_name.split(" ")
-                Guild_member = worksheet.find(dis_name[1])#이름 찾기
-                worksheet.update_cell(col=79, row=Guild_member.row, value='TRUE')
-                worksheet.update_cell(col=80, row=Guild_member.row, value=time)
-                await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
+                worksheet_attendance.find(dis_name[1])#이름 찾기
             except:
                 await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
-        elif ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
+                return
             try:
                 time = str(now)
                 dis_name = member.display_name.split(" ")
@@ -272,7 +269,24 @@ async def _attendance(ctx, member: discord.Member=None):
                 worksheet.update_cell(col=80, row=Guild_member.row, value=time)
                 await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
             except:
+                await ctx.channel.send(f'<@{member.id}> "{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
+        elif ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
+            try:
+                time = str(now)
+                dis_name = member.display_name.split(" ")
+                worksheet_attendance.find(dis_name[1])#이름 찾기
+            except:
                 await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
+                return
+            try:
+                time = str(now)
+                dis_name = member.display_name.split(" ")
+                Guild_member = worksheet.find(dis_name[1])#이름 찾기
+                worksheet.update_cell(col=79, row=Guild_member.row, value='TRUE')
+                worksheet.update_cell(col=80, row=Guild_member.row, value=time)
+                await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
+            except:
+                await ctx.channel.send(f'<@{member.id}> "{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
         else:
             await ctx.channel.send(f'<@{member.id}>님 지금은 출석시간 아닙니다.')
     else:
