@@ -122,15 +122,17 @@ async def _help(ctx):
 async def _severHelp(ctx):
     if ctx.guild:
         if ctx.author.guild_permissions.manage_messages:
-            await ctx.channel.send('!흥보 (시작,종료) | 13시-23시 1시간 간격으로 메시지 보냄\n!흥보 문구 [메시지] | 흥보문구 변경\n!공지 (#채널명) [메시지] | 채팅방에 봇이 메시지를 말함\n!영토전 (종료,출석)')
+            await ctx.channel.send('!흥보 (시작,종료) | 13시-23시 1시간 간격으로 메시지 보냄\n!흥보 문구 [메시지] | 흥보문구 변경\n!공지 (#채널명) [메시지] | 채팅방에 봇이 메시지를 말함\n!영토전 (시작,종료)\n!출석 (시작,종료)')
     return
 
 # !공지 #채널명 메시지
 @bot.command(name="공지", pass_context=True)
 @commands.has_permissions(manage_messages=True)
 async def _notion(ctx, channal, *, args):
-    channal = int(channal[2:-1])
-    await bot.get_channel(channal).send(args)
+    if ctx.guild:
+        if ctx.author.guild_permissions.manage_messages:
+            channal = int(channal[2:-1])
+            await bot.get_channel(channal).send(args)
     return
 
 # !가입 이름 가문명 레벨 무기 가입상태
@@ -164,6 +166,28 @@ async def _join(ctx, name, guild, level):
         await ctx.channel.send(f'<@{member.id}>님 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문명(검산,검해,검천,검훈) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
     return
 
+@bot.command(name="출석", pass_context=True)
+async def _attendance(ctx, check):
+    global teCheck
+    guild = ctx.guild
+    if ctx.channel.id == 851109990507872286: #출석 체크방
+        return
+    if check == "시작":
+        if guild:
+            if ctx.author.guild_permissions.manage_messages:
+                teCheck = "시작"
+                print(teCheck)
+                await ctx.channel.send('```----------- 금일 영토전 출석 시작 -----------```\n<#876548929968275486>에서 !출첵 (@이름)')
+                await bot.get_channel(free_channel).send('```----------- 금일 영토전 출석 시작 -----------```\n<#876548929968275486>에서 !출첵 (@이름)')                
+
+    elif check == "종료":
+        if guild:
+            if ctx.author.guild_permissions.manage_messages:
+                teCheck = check
+                print(teCheck)
+                await ctx.channel.send(f'```----------- 출석이 마감되었습니다. -----------```')
+                await bot.get_channel(free_channel).send(f'```----------- 출석이 마감되었습니다. -----------```')
+
 # !영토전 (참가,늦참,불참) (@이름)
 @bot.command(name="영토전", pass_context=True)
 async def _terrirorial(ctx, status, member: discord.Member=None):
@@ -192,13 +216,13 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
             else:
                 await ctx.channel.send(f'<@{member.id}> 영토전을 종료할 권한이 없습니다.')
                 return
-    elif status == "출석" or "시작":
+    elif status == "시작":
         if guild:
             if ctx.author.guild_permissions.manage_roles:
-                teCheck = status
+                teCheck = "시작"
                 print(teCheck)
-                await ctx.channel.send('```----------- 금일 영토전 출석 시작 -----------```<#876548929968275486>에서 !출첵 (@이름)')
-                await bot.get_channel(free_channel).send('```----------- 금일 영토전 출석 시작 -----------```<#876548929968275486>에서 !출첵 (@이름)')                
+                await ctx.channel.send('```----------- 금일 영토전 출석 시작 -----------```\n<#876548929968275486>에서 !출첵 (@이름)')
+                await bot.get_channel(free_channel).send('```----------- 금일 영토전 출석 시작 -----------```\n<#876548929968275486>에서 !출첵 (@이름)')                
                 return
 
     try:
@@ -222,12 +246,24 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
 # !출첵 (@이름)
 @bot.command(name="출첵", pass_context=True)
 async def _attendance(ctx, member: discord.Member=None):
-    if ctx.channel == 876548929968275486:
+    if ctx.channel.id == 851109990507872286: #출석 체크방
+        return
+    elif ctx.channel.id == 876548929968275486: #영토전 출첵방
         member = member or ctx.message.author
         now = datetime.datetime.now()
         week = now.isoweekday()
         hour = now.hour
-        if teCheck == "출석" or "시작" or ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
+        if teCheck == "시작":
+            try:
+                time = str(now)
+                dis_name = member.display_name.split(" ")
+                Guild_member = worksheet.find(dis_name[1])#이름 찾기
+                worksheet.update_cell(col=79, row=Guild_member.row, value='TRUE')
+                worksheet.update_cell(col=80, row=Guild_member.row, value=time)
+                await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
+            except:
+                await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
+        elif ((week == 1 or week == 6) and (hour >= 20 and hour <= 23)):
             try:
                 time = str(now)
                 dis_name = member.display_name.split(" ")
@@ -239,6 +275,8 @@ async def _attendance(ctx, member: discord.Member=None):
                 await ctx.channel.send(f'<@{member.id}>님은 영토전 참가자가 아닙니다.')
         else:
             await ctx.channel.send(f'<@{member.id}>님 지금은 출석시간 아닙니다.')
+    else:
+        await ctx.channel.send(f'<@{member.id}>님 <#876548929968275486>에서 출첵 해주시기 바랍니다. ')
     return
 
 # !흥보 (시작,종료) | 13시-23시 2시간간격 메시지 보냄\n!흥보 문구 [메시지]
