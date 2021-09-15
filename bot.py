@@ -13,6 +13,7 @@
 ######          pip3 install asyncio                                               ######
 ######          pip3 install gspread                                               ######
 ######          pip3 install --upgrade oauth2client                                ######
+######          pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib #####
 #########################################################################################
 #########################################################################################
 #########################################################################################
@@ -163,7 +164,7 @@ async def _join(ctx, name, guild, level):
         except Exception as err:
             await bot.get_channel(manage_bot_channel).send(err)
     else:
-        await ctx.channel.send(f'<@{member.id}>님 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문명(검산,검해,검천,검훈) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
+        await ctx.channel.send(f'<@{member.id}>님 가입 양식에 맞춰서 다시 작성 부탁드립니다. \n!가입 이름 가문명(검산,검해,검천) 레벨 주무기 가입여부(O,X) ```!가입 흰검 검해 100 창 O```')
     return
 
 @bot.command(name="출석", pass_context=True)
@@ -228,7 +229,7 @@ async def _terrirorial(ctx, status, member: discord.Member=None):
         dis_name = member.display_name.split(" ")
         Guild_member = worksheet.find(dis_name[1])
         worksheet.update_cell(col=terriCol, row = Guild_member.row, value = yesno)
-        worksheet.update_cell(col=78, row = Guild_member.row, value = yesno)
+        worksheet.update_cell(col=terriCol+1, row = Guild_member.row, value = yesno)
         Now_member = worksheet.acell('J4').value
         await ctx.channel.send(f'<@{member.id}> "{dis_name[1]}" 영토전 {status} 확인됨 [참가인원] {Now_member}명')
     except:
@@ -282,8 +283,8 @@ async def _attendance(ctx, member: discord.Member=None):
                 time = str(now)
                 dis_name = member.display_name.split(" ")
                 Guild_member = worksheet.find(dis_name[1])#이름 찾기
-                worksheet.update_cell(col=79, row=Guild_member.row, value='TRUE')
-                worksheet.update_cell(col=80, row=Guild_member.row, value=time)
+                worksheet.update_cell(col=12, row=Guild_member.row, value='TRUE')
+                worksheet.update_cell(col=13, row=Guild_member.row, value=time)
                 await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
             except:
                 await ctx.channel.send(f'<@{member.id}> "{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
