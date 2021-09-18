@@ -266,8 +266,8 @@ async def _attendance(ctx, member: discord.Member=None):
                 time = str(now)
                 dis_name = member.display_name.split(" ")
                 Guild_member = worksheet.find(dis_name[1])#이름 찾기
-                worksheet.update_cell(col=79, row=Guild_member.row, value='TRUE')
-                worksheet.update_cell(col=80, row=Guild_member.row, value=time)
+                worksheet.update_cell(col=12, row=Guild_member.row, value='TRUE')
+                worksheet.update_cell(col=13, row=Guild_member.row, value=time)
                 await ctx.channel.send(f'<@{member.id}>님의 출석 확인')
             except:
                 await ctx.channel.send(f'<@{member.id}> "{dis_name[1]}" 이름이 없거나 틀림 신규 가문원이라면 <#840536404945010688>에서 확인 후 진행')
